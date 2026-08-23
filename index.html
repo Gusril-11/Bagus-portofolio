@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bagus Rilo — UI/UX Designer & Information Systems Graduate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root{
+    --ink:#080505;
+    --surface:#170A0A;
+    --surface-2:#210D0D;
+    --line:#3D1518;
+    --violet:#FF2D46;
+    --cyan:#6B0A0F;
+    --warm:#FF5A36;
+    --text:#F5F1F1;
+    --muted:#9C8688;
+    --grad: linear-gradient(120deg, var(--violet), var(--cyan));
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--text);
+    font-family:'Poppins',sans-serif;
+    line-height:1.6;
+    position:relative;
+  }
+  ::selection{background:var(--violet);color:#fff;}
+  h1,h2,h3{font-family:'Poppins',sans-serif;font-weight:700;letter-spacing:-0.02em;}
+  #particle-canvas{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+  }
+  .wrap, nav, footer{position:relative;z-index:1;}
+  a{color:inherit;text-decoration:none;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 28px;}
+  section{padding:120px 0;position:relative;}
+
+  /* NAV */
+  nav{
+    position:fixed;top:20px;left:50%;transform:translateX(-50%);
+    z-index:100;
+    display:flex;gap:4px;align-items:center;
+    background:rgba(23,10,10,0.75);
+    backdrop-filter:blur(14px);
+    border:1px solid var(--line);
+    border-radius:100px;
+    padding:8px 10px;
+  }
+  nav .brand{
+    font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;
+    padding:8px 14px;color:var(--text);
+  }
+  nav a.nav-link{
+    font-size:13px;padding:8px 14px;border-radius:100px;color:var(--muted);
+    transition:all .2s ease;
+  }
+  nav a.nav-link:hover, nav a.nav-link.active{background:var(--surface-2);color:var(--text);}
+  nav a.nav-link:focus-visible, a:focus-visible, button:focus-visible{
+    outline:2px solid var(--warm); outline-offset:2px;
+  }
+  @media(max-width:760px){
+    nav{max-width:92%;overflow-x:auto;padding:6px 8px;}
+    nav .brand{display:none;}
+    nav a.nav-link{white-space:nowrap;padding:8px 10px;font-size:12px;}
+  }
+
+  /* HERO */
+  .hero{
+    min-height:100vh;display:flex;align-items:center;
+    padding-top:120px;
+  }
+  .hero-grid{
+    display:grid;grid-template-columns:1.15fr 0.85fr;gap:56px;align-items:center;width:100%;
+  }
+  .hero-photo{
+    position:relative;border-radius:50%;padding:6px;
+    background:var(--grad);
+    justify-self:end;width:100%;max-width:320px;
+  }
+  .hero-photo .photo-inner{
+    border-radius:50%;overflow:hidden;background:var(--surface);
+    aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;
+  }
+  .hero-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .hero-photo .photo-fallback{
+    color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center;padding:20px;
+  }
+  @media(max-width:860px){
+    .hero-grid{grid-template-columns:1fr;}
+    .hero-photo{justify-self:center;order:-1;max-width:220px;}
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--warm);
+    border:1px solid var(--line);padding:6px 12px;border-radius:100px;
+    margin-bottom:28px; width:fit-content;
+  }
+  .eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--warm);
+    box-shadow:0 0 0 4px rgba(255,90,54,0.15);}
+  .hero h1{
+    font-size:clamp(42px, 8vw, 92px);
+    font-weight:700;
+    line-height:1.02;
+  }
+  .hero h1 .grad{
+    background:var(--grad);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p.lead{
+    margin-top:26px;max-width:560px;color:var(--muted);font-size:18px;
+  }
+  .hero .actions{display:flex;gap:14px;margin-top:40px;flex-wrap:wrap;}
+  .btn{
+    font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;
+    padding:14px 26px;border-radius:12px;display:inline-flex;align-items:center;gap:8px;
+    transition:transform .18s ease, box-shadow .18s ease;
+    border:1px solid transparent;
+  }
+  .btn-primary{background:var(--grad);color:var(--ink);}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px -8px rgba(255,45,70,0.5);}
+  .btn-ghost{border-color:var(--line);color:var(--text);}
+  .btn-ghost:hover{border-color:var(--warm);transform:translateY(-2px);}
+
+  .hero-meta{
+    margin-top:70px;display:flex;gap:36px;flex-wrap:wrap;
+    padding-top:28px;border-top:1px solid var(--line);
+  }
+  .hero-meta div{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+  .hero-meta strong{display:block;font-family:'Poppins',sans-serif;color:var(--text);font-size:16px;font-weight:600;margin-bottom:2px;}
+
+  /* SECTION HEADS */
+  .section-head{margin-bottom:56px;}
+  .section-head .tag{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--warm);}
+  .section-head h2{font-size:clamp(30px,4vw,44px);margin-top:10px;}
+
+  /* ABOUT */
+  .about-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:60px;align-items:start;}
+  .about-grid p{color:var(--muted);margin-bottom:16px;font-size:16px;}
+  .focus-list{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
+  .focus-list span{
+    font-family:'JetBrains Mono',monospace;font-size:12px;
+    border:1px solid var(--line);padding:8px 14px;border-radius:8px;color:var(--warm);
+  }
+  .info-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px;
+  }
+  .info-card .row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .info-card .row:last-child{border-bottom:none;}
+  .info-card .row span:first-child{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px;}
+  .info-card .row span:last-child{font-weight:500;text-align:right;}
+  @media(max-width:800px){.about-grid{grid-template-columns:1fr;}}
+
+  /* SKILLS */
+  .skills-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+  .skill-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;
+  }
+  .skill-card .k-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--warm);margin-bottom:14px;letter-spacing:.05em;}
+  .skill-card h3{font-size:17px;margin-bottom:16px;}
+  .skill-card ul{list-style:none;display:flex;flex-direction:column;gap:9px;}
+  .skill-card li{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px;}
+  .skill-card li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--warm);flex-shrink:0;}
+  @media(max-width:900px){.skills-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.skills-grid{grid-template-columns:1fr;}}
+
+  /* PROJECTS — signature: browser-window style cards */
+  .projects-grid{display:flex;flex-direction:column;gap:28px;}
+  .proj-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    display:grid;grid-template-columns:1fr 1fr;
+    transition:border-color .2s ease;
+  }
+  .proj-card:hover{border-color:var(--violet);}
+  .proj-card:nth-child(even){grid-template-columns:1fr 1fr;}
+  .proj-card:nth-child(even) .proj-window{order:2;}
+  .proj-window{
+    background:var(--ink);padding:18px;display:flex;flex-direction:column;
+  }
+  .proj-window .bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+  .proj-window .dot{width:9px;height:9px;border-radius:50%;}
+  .dot.r{background:#FF5F57;} .dot.y{background:#FEBC2E;} .dot.g{background:#28C840;}
+  .proj-window .url{
+    margin-left:10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);
+    background:var(--surface-2);padding:5px 12px;border-radius:6px;flex:1;
+  }
+  .proj-window .screen{
+    flex:1;border-radius:8px;
+    background:var(--grad-preview, var(--grad));
+    display:flex;align-items:center;justify-content:center;
+    min-height:180px;position:relative;overflow:hidden;
+  }
+  .proj-window .screen .glyph{font-size:56px;opacity:.9;}
+  .proj-body{padding:32px 32px 32px 8px;display:flex;flex-direction:column;}
+  .proj-card:nth-child(even) .proj-body{padding:32px 8px 32px 32px;}
+  .proj-body .proj-role{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--warm);margin-bottom:10px;}
+  .proj-body h3{font-size:24px;margin-bottom:12px;}
+  .proj-body p{color:var(--muted);font-size:15px;margin-bottom:18px;}
+  .proj-tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+  .proj-tools span{font-family:'JetBrains Mono',monospace;font-size:11px;border:1px solid var(--line);padding:5px 10px;border-radius:6px;color:var(--muted);}
+  .proj-link{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-family:'Poppins',sans-serif;font-size:14px;color:var(--violet);width:fit-content;}
+  .proj-link:hover{color:var(--warm);}
+  @media(max-width:800px){
+    .proj-card, .proj-card:nth-child(even){grid-template-columns:1fr;}
+    .proj-card:nth-child(even) .proj-window{order:0;}
+    .proj-body, .proj-card:nth-child(even) .proj-body{padding:28px;}
+  }
+
+  /* EXPERIENCE / TIMELINE */
+  .timeline{border-left:2px solid var(--line);padding-left:32px;display:flex;flex-direction:column;gap:44px;margin-left:8px;}
+  .t-item{position:relative;}
+  .t-item::before{
+    content:'';position:absolute;left:-40px;top:4px;width:14px;height:14px;border-radius:50%;
+    background:var(--ink);border:2px solid var(--violet);
+  }
+  .t-item .t-date{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--warm);margin-bottom:6px;}
+  .t-item h3{font-size:19px;margin-bottom:6px;}
+  .t-item .t-org{color:var(--warm);font-size:14px;margin-bottom:10px;font-weight:500;}
+  .t-item p{color:var(--muted);font-size:15px;}
+
+  /* CERTIFICATES */
+  .cert-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .cert-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .cert-card .cert-icon{width:36px;height:36px;border-radius:10px;background:var(--grad);}
+  .cert-card h3{font-size:16px;}
+  .cert-card span{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+  @media(max-width:760px){.cert-grid{grid-template-columns:1fr;}}
+
+  /* CONTACT */
+  .contact-box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 64px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--grad);
+    opacity: .08;
+  }
+
+  .contact-box h2 {
+    font-size: clamp(28px, 5vw, 48px);
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .contact-box p {
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto 36px;
+    position: relative;
+  }
+
+  .contact-links {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .clink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    border: 1px solid var(--line);
+    padding: 12px 20px;
+    border-radius: 100px;
+    background: var(--ink);
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .clink i{
+    font-size:17px;
+    line-height:1;
+  }
+
+  .clink:hover {
+    border-color: var(--warm);
+    color: var(--warm);
+    transform: translateY(-3px);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 40px 0;
+    text-align: center;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    *{transition:none!important;}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<nav>
+  <span class="brand">BR.</span>
+  <a class="nav-link" href="#about">About</a>
+  <a class="nav-link" href="#skills">Skills</a>
+  <a class="nav-link" href="#projects">Projects</a>
+  <a class="nav-link" href="#experience">Experience</a>
+  <a class="nav-link" href="#certificates">Certificates</a>
+  <a class="nav-link" href="#contact">Contact</a>
+</nav>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+   <div class="hero-grid">
+    <div>
+    <div class="eyebrow mono">available for freelance & full-time roles</div>
+    <h1>Bagus Rilo<br><span class="grad">Pambudi</span></h1>
+    <p class="lead">UI/UX Designer & Information Systems Graduate. Merancang pengalaman digital yang jelas dan mudah digunakan — dari riset, wireframe, sampai antarmuka yang siap dibangun.</p>
+    <div class="actions">
+      <a href="#projects" class="btn btn-primary">View My Projects →</a>
+      <a href="#contact" class="btn btn-ghost">Contact Me</a>
+    </div>
+    <div class="hero-meta">
+      <div><strong>3+</strong>project selesai</div>
+      <div><strong>UI/UX</strong>fokus utama</div>
+      <div><strong>MBKM</strong>studi independen</div>
+      <div><strong>Jambi, ID</strong>berbasis di</div>
+    </div>
+    </div>
+   <div class="hero-photo">
+    <div class="photo-inner">
+      <img src="fotoijazah.png" alt="Foto Bagus Rilo Pambudi" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="photo-fallback" style="display:none; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%;">
+        Letakkan file foto kamu<br>bernama <strong style="color:var(--text)">fotoijazah.png</strong><br>di folder yang sama
+      </div>
+    </div>
+   </div>
+   </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-head">
+      <div class="tag mono">01 / About</div>
+      <h2>Tentang Saya</h2>
+    </div>
+    <div class="about-grid">
+      <div>
+        <p>Saya lulusan Sistem Informasi yang tertarik pada titik temu antara desain dan teknologi — bagaimana sebuah sistem bisa terasa sederhana meski di baliknya kompleks. Selama masa studi, saya mengikuti program MBKM / Studi Independen di PT Vinix Seven Aurum, tempat saya mengasah kemampuan riset pengguna, UI/UX design, dan pengembangan web.</p>
+        <p>Saya senang mengerjakan proyek dari nol: memahami masalah pengguna, menyusun alur, mendesain di Figma, lalu menerjemahkannya menjadi antarmuka yang bisa dipakai orang sungguhan.</p>
+        <div class="focus-list">
+          <span>UI/UX Design</span>
+          <span>Web Development</span>
+          <span>Information Systems</span>
+          <span>Design Thinking</span>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="row"><span>EDUCATION</span><span>S1 Sistem Informasi</span></div>
+        <div class="row"><span>UNIVERSITY</span><span>Universitas Dinamika Bangsa Jambi</span></div>
+        <div class="row"><span>PROGRAM</span><span>MBKM Studi Independen</span></div>
+        <div class="row"><span>COMPANY</span><span>PT Vinix Seven Aurum</span></div>
+        <div class="row"><span>STATUS</span><span>Open to work</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-head">
+      <div class="tag mono">02 / Skills</div>
+      <h2>Kemampuan</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="k-label">DESIGN</div>
+        <h3>Desain & Riset</h3>
+        <ul>
+          <li>Figma</li>
+          <li>UI Design</li>
+          <li>UX Research</li>
+          <li>Prototyping</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="k-label">DEVELOPMENT</div>
+        <h3>Pengembangan</h3>
+        <ul>
+          <li>HTML & CSS</li>
+          <li>JavaScript</li>
+          <li>Flutter</li>
+          <li>Kotlin</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="k-label">DATABASE</div>
+        <h3>Basis Data</h3>
+        <ul>
+          <li>MySQL</li>
+          <li>Firebase</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="k-label">TOOLS</div>
+        <h3>Perangkat Kerja</h3>
+        <ul>
+          <li>GitHub</li>
+          <li>VS Code</li>
+          <li>Microsoft Office</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-head">
+      <div class="tag mono">03 / Projects</div>
+      <h2>Karya Terpilih</h2>
+    </div>
+    <div class="projects-grid">
+
+      <div class="proj-card">
+        <div class="proj-window">
+          <div class="bar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="url">taskreview.app</span>
+          </div>
+          <div class="screen"><span class="glyph">🗂️</span></div>
+        </div>
+        <div class="proj-body">
+          <div class="proj-role mono">ROLE — UI/UX DESIGNER</div>
+          <h3>Task Review</h3>
+          <p>Desain UI/UX untuk platform review tugas berbasis web, disusun menggunakan pendekatan Design Thinking dari riset masalah hingga high-fidelity prototype.</p>
+          <div class="proj-tools">
+            <span>Figma</span><span>Design Thinking</span><span>Prototyping</span>
+          </div>
+          <a href="#" class="proj-link">View Case Study →</a>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-window">
+          <div class="bar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="url">medqueue.id</span>
+          </div>
+          <div class="screen" style="--grad-preview: linear-gradient(120deg, var(--violet), var(--warm));"><span class="glyph">🩺</span></div>
+        </div>
+        <div class="proj-body">
+          <div class="proj-role mono">ROLE — UI/UX DESIGNER</div>
+          <h3>MedQueue</h3>
+          <p>Aplikasi antrean digital untuk Puskesmas, dirancang agar pasien dan petugas bisa mengelola antrean tanpa kebingungan atau antrean fisik yang menumpuk.</p>
+          <div class="proj-tools">
+            <span>Figma</span><span>UX Research</span><span>Mobile UI</span>
+          </div>
+          <a href="#" class="proj-link">View Case Study →</a>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <div class="proj-window">
+          <div class="bar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="url">pengaduan-warga.go.id</span>
+          </div>
+          <div class="screen" style="--grad-preview: linear-gradient(120deg, var(--cyan), var(--warm));"><span class="glyph">📢</span></div>
+        </div>
+        <div class="proj-body">
+          <div class="proj-role mono">ROLE — UI/UX & FRONTEND</div>
+          <h3>Aplikasi Pengaduan Masyarakat</h3>
+          <p>Platform pengaduan warga yang menghubungkan laporan masyarakat dengan instansi terkait, lengkap dengan pelacakan status laporan secara real-time.</p>
+          <div class="proj-tools">
+            <span>HTML/CSS/JS</span><span>MySQL</span><span>UI Design</span>
+          </div>
+          <a href="#" class="proj-link">View Case Study →</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="section-head">
+      <div class="tag mono">04 / Experience</div>
+      <h2>Pengalaman</h2>
+    </div>
+    <div class="timeline">
+      <div class="t-item">
+        <div class="t-date mono">2025 — 2026</div>
+        <h3>MBKM / Studi Independen</h3>
+        <div class="t-org">PT Vinix Seven Aurum</div>
+        <p>Terlibat dalam proses desain UI/UX dan pengembangan web, mulai dari riset pengguna, wireframing, hingga implementasi antarmuka bersama tim.</p>
+      </div>
+      <div class="t-item">
+        <div class="t-date mono">2023 — 2025</div>
+        <h3>Anggota Organisasi Kemahasiswaan</h3>
+        <div class="t-org">Universitas Dinamika Bangsa Jambi</div>
+        <p>Berkontribusi dalam kegiatan organisasi kampus, mengasah kemampuan kerja tim, komunikasi, dan manajemen proyek kecil.</p>
+      </div>
+      <div class="t-item">
+        <div class="t-date mono">2022 — sekarang</div>
+        <h3>Proyek Independen</h3>
+        <div class="t-org">Freelance / Personal Project</div>
+        <p>Mengerjakan beberapa studi kasus UI/UX dan proyek pengembangan web secara mandiri untuk memperkuat portofolio.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATES -->
+  <section id="certificates">
+    <div class="section-head">
+      <div class="tag mono">05 / Certificates</div>
+      <h2>Sertifikat & Pencapaian</h2>
+    </div>
+    <div class="cert-grid">
+      <div class="cert-card">
+        <div class="cert-icon"></div>
+        <h3>Sertifikat MBKM Studi Independen</h3>
+        <span>PT Vinix Seven Aurum</span>
+      </div>
+      <div class="cert-card">
+        <div class="cert-icon"></div>
+        <h3>TOEFL</h3>
+        <span>Sertifikat kemampuan bahasa Inggris</span>
+      </div>
+      <div class="cert-card">
+        <div class="cert-icon"></div>
+        <h3>Seminar & Pelatihan UI/UX</h3>
+        <span>Pelatihan desain antarmuka</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-box">
+      <h2>Let's work together.</h2>
+      <p>Terbuka untuk peluang kerja, kolaborasi proyek, atau sekadar diskusi seputar UI/UX dan pengembangan web.</p>
+      <div class="contact-links">
+        <a class="clink" href="mailto:bagusrilopambudi40@gmail.com">
+            <i class="fa-solid fa-envelope"></i>bagusrilopambudi40@gmail.com
+        </a>
+        <a class="clink" href="https://wa.me/6280000000000" target="_blank">
+            <i class="fa-brands fa-whatsapp"></i>WhatsApp
+        </a>
+        <a class="clink" href="https://www.linkedin.com/in/bagus-rilo-pambudi/" target="_blank">
+            <i class="fa-brands fa-linkedin"></i>LinkedIn
+        </a>
+        <a class="clink" href="https://github.com/" target="_blank">
+            <i class="fa-brands fa-github"></i>GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>© 2026 Bagus Rilo Pambudi — Dibuat dengan niat baik dan banyak kopi.</footer>
+
+<script>
+  // Falling particles background
+  (function(){
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let w, h, particles;
+
+    function resize(){
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+
+    function makeParticles(){
+      const count = Math.min(90, Math.floor((w * h) / 18000));
+      const colors = ['#FF2D46', '#FF5A36', '#9C1A22'];
+      particles = Array.from({length: count}, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 2 + 1,
+        speed: Math.random() * 0.6 + 0.25,
+        drift: (Math.random() - 0.5) * 0.4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: Math.random() * 0.5 + 0.3
+      }));
+    }
+
+    function tick(){
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+
+        p.y += p.speed;
+        p.x += p.drift;
+
+        if (p.y > h + 10){
+          p.y = -10;
+          p.x = Math.random() * w;
+        }
+        if (p.x > w + 10) p.x = -10;
+        if (p.x < -10) p.x = w + 10;
+      });
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(tick);
+    }
+
+    resize();
+    makeParticles();
+    window.addEventListener('resize', () => { resize(); makeParticles(); });
+
+    if (!reduceMotion){
+      requestAnimationFrame(tick);
+    } else {
+      // Static scatter, no animation, for reduced-motion preference
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    }
+  })();
+
+  // Active nav link on scroll
+  const links = document.querySelectorAll('.nav-link');
+  const sections = [...links].map(l => document.querySelector(l.getAttribute('href')));
+  window.addEventListener('scroll', () => {
+    let current = sections[0];
+    sections.forEach(s => { if (s && window.scrollY >= s.offsetTop - 140) current = s; });
+    links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + current.id));
+  });
+</script>
+
+</body>
+</html>
